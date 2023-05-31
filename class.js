@@ -1,5 +1,28 @@
 let j = 0;
 let k = 0;
+
+function calcPos(index) {
+	if (index - 1 < moveArray.length) {
+
+		if (moveArray[index - 1] == 'right') {
+			playerPieces[index].x = playerPieces[index - 1].x - tileSize;
+			playerPieces[index].y = playerPieces[index - 1].y;
+		} else if (moveArray[index - 1] == 'left') {
+			playerPieces[index].x = playerPieces[index - 1].x + tileSize;
+			playerPieces[index].y = playerPieces[index - 1].y;
+		} else if (moveArray[index - 1] == 'up') {
+			playerPieces[index].y = playerPieces[index - 1].y + tileSize;
+			playerPieces[index].x = playerPieces[index - 1].x;
+		} else if (moveArray[index - 1] == 'down') {
+			playerPieces[index].y = playerPieces[index - 1].y - tileSize;
+			playerPieces[index].x = playerPieces[index - 1].x;
+		}
+	} else {
+		playerPieces[index].y = playerPieces[index - 1].y;
+		playerPieces[index].x = playerPieces[index - 1].x;
+	}
+}
+
 class player {
 	constructor(id, x, y, player) {
 		this.x = x;
@@ -31,14 +54,12 @@ class player {
 			}
 		});
 		if (index !== 0) {
-
 			if (this.id == playerPieces.length - 1 && this.id !== 0) {
-				this.image = playerBody;
-			} else if (this.id === 0) {
-				this.image = apple;
+				this.image = playerBody;//the tail
 			} else {
 				this.image = playerBody;
 			}
+			calcPos(index);
 		} else {
 			if (pressed == 'right') {
 				this.x = this.x + tileSize;
@@ -57,7 +78,6 @@ class player {
 			this.lastMove.splice(2, this.lastMove.length - 1);
 
 			moveArray.unshift(pressed);
-			console.log(moveArray);
 
 			playerPieces.forEach((object, index) => {
 				if (object.x === this.x && object.y === this.y && this.id !== this.id) {
@@ -76,9 +96,9 @@ class player {
 	}
 	draw(index) {
 		ctx.drawImage(this.image, this.x, this.y, tileSize, tileSize);
-		ctx.font = '25px Arial';
-		ctx.textAlign = 'Right';
-		ctx.fillText(index, this.x, this.y + tileSize);
+		//ctx.font = '25px Arial';
+		//ctx.textAlign = 'Right';
+		//ctx.fillText(index, this.x, this.y + tileSize);
 	}
 }
 
@@ -97,23 +117,12 @@ class collectable {
 	update(index) {
 		if (playerPieces[0].x == this.x && playerPieces[0].y == this.y) {
 			collectables.splice(index, 1);
-			if (playerPieces[playerPieces.length - 1].lastMove[0] == 'down') {
-				playerPieces.push(new player(length, playerPieces[playerPieces.length - 1].x, playerPieces[playerPieces.length - 1].y - tileSize));
-			} else if (playerPieces[playerPieces.length - 1].lastMove[0] == 'up') {
-				playerPieces.push(new player(length, playerPieces[playerPieces.length - 1].x, playerPieces[playerPieces.length - 1].y + tileSize));
-			} else if (playerPieces[playerPieces.length - 1].lastMove[0] == 'right') {
-				playerPieces.push(new player(length, playerPieces[playerPieces.length - 1].x - tileSize, playerPieces[playerPieces.length - 1].y));
-			} else if (playerPieces[playerPieces.length - 1].lastMove[0] == 'left') {
-				playerPieces.push(new player(length, playerPieces[playerPieces.length - 1].x + tileSize, playerPieces[playerPieces.length - 1].y));
-			} else if (playerPieces[playerPieces.length - 1].lastMove[0] ==  undefined) {
-				throw new Error('The last move of the piece is undefined!');
-			}
-			
-			console.log(playerPieces[playerPieces.length - 1].lastMove[1]);
-			playerPieces[playerPieces.length - 1].lastMove[1] = playerPieces[playerPieces.length - 2].lastMove[0];
+			playerPieces.push(new player(playerPieces.length, 0, 0));//length is 1 greater than the index of the last element
+			calcPos(playerPieces.length - 1);//so if we want to calc pos for the index of the last element, we have to subtract 1 from the length.
+
 			length = ++length;
-			console.log('colleted', playerPieces[playerPieces.length - 1].lastMove[1]);
 			collectables.push(new collectable('apple', Math.floor((Math.random() * CANVAS_WIDTH/tileSize))*tileSize, Math.floor((Math.random() * CANVAS_HEIGHT/tileSize))*tileSize));
+
 
 		}  else if (playerPieces2 !== null && playerPieces2[0].x == this.x && playerPieces2[0].y == this.y) {//player 2 logic
 			collectables.splice(index, 1);
@@ -147,88 +156,6 @@ class collectable {
 			collectables.push(new collectable('apple', rngX, rngY));
 			
 		}
-	}
-	draw() {
-		ctx.drawImage(this.image, this.x, this.y, tileSize, tileSize);
-	}
-}
-
-class player2 {
-	constructor(id, x, y, player) {
-		this.x = x;
-		this.y = y;
-		if (id === 0) {
-			this.image = apple;
-		} else {
-			this.image = playerBody;
-		}
-		console.log(id);
-		this.length = 1;
-		this.id = id;
-		this.lastMove = [pressed2];
-		this.inc = 0;
-	}
-	update(index) {
-		playerPieces2.forEach((object, index) => {
-			if (object.x === this.x && object.y === this.y && this.id !== object.id || object.x < 0 || object.y < 0 || object.x > CANVAS_WIDTH - tileSize || object.y > CANVAS_HEIGHT - tileSize) {
-				ctx.font = '30px Arial';
-				ctx.fillStyle = 'red';
-				ctx.fillText('You Died (Player 2)!', 400, 400);
-				isOn = 'game_over';
-			}
-		});
-		if (index !== 0) {
-			console.log(playerPieces2[index].lastMove[1]);
-			if (playerPieces2[index - 1].lastMove[1] == 'right') {
-				this.x = this.x + tileSize;
-			} else if (playerPieces2[index - 1].lastMove[1] == 'left') {
-				this.x = this.x - tileSize;
-			} else if (playerPieces2[index - 1].lastMove[1] == 'up') {
-				this.y = this.y - tileSize;
-			} else if (playerPieces2[index - 1].lastMove[1] == 'down') {
-				this.y = this.y + tileSize;
-			}
-			this.lastMove.unshift(playerPieces2[index - 1].lastMove[1]);
-			this.lastMove.splice(2, this.lastMove.length - 1);
-
-			if (this.id == playerPieces2.length - 1 && this.id !== 0) {
-				this.image = playerBody;
-			} else if (this.id === 0) {
-				this.image = apple;
-			} else {
-				this.image = playerBody;
-			}
-		} else {
-			if (pressed2 == 'right') {
-				this.x = this.x + tileSize;
-				this.image = playerHeadRight;
-			} else if (pressed2 == 'left') {
-				this.image = playerHeadLeft;
-				this.x = this.x - tileSize;
-			} else if (pressed2 == 'up') {
-				this.image = playerHeadUp;
-				this.y = this.y - tileSize;
-			} else if (pressed2 == 'down') {
-				this.image = playerHeadDown;
-				this.y = this.y + tileSize;
-			}
-			this.lastMove.unshift(pressed2);
-			this.lastMove.splice(2, this.lastMove.length - 1);
-
-			playerPieces2.forEach((object, index) => {
-				if (object.x === this.x && object.y === this.y && this.id !== this.id) {
-					alert('you died!');
-				}
-			});
-
-			playerPieces.forEach((object, index) => {
-				if (object.x === this.x && object.y === this.y) {
-					alert('Player 1 wins!');
-					isOn = 'gameOver';
-				}
-			});
-		}
-		console.log(playerPieces2[0].lastMove);
 	}
 	draw() {
 		ctx.drawImage(this.image, this.x, this.y, tileSize, tileSize);
