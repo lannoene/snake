@@ -1,0 +1,14 @@
+const playerIcon = new Image();
+playerIcon.src = 'mushroom.png';
+const apple = new Image();
+apple.src = 'Heart_Sprite.webp';
+const playerBody = new Image();
+playerBody.src = 'player_body.png';
+const playerHeadUp = new Image();
+playerHeadUp.src = 'player_head_up.png';
+const playerHeadDown = new Image();
+playerHeadDown.src = 'player_head_down.png';
+const playerHeadRight = new Image();
+playerHeadRight.src = 'player_head_right.png';
+const playerHeadLeft = new Image();
+playerHeadLeft.src = 'player_head_left.png';
