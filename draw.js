@@ -21,33 +21,43 @@ let tileSize = 25;
 
 let players = [];
 let gameFrame = 0;
-let appleCount = 200;
+let appleCount = 50;
 let collectables = [];
-for (i = 0; i < appleCount; i = i + 1) {
-	let rngX = Math.floor((Math.random() * CANVAS_WIDTH/tileSize))*tileSize;
-	let rngY = Math.floor((Math.random() * CANVAS_HEIGHT/tileSize))*tileSize;
 
-	collectables.forEach((object, index) => {
-		while (object.x == rngX && object.y == rngY) {
-			rngX = Math.floor((Math.random() * CANVAS_WIDTH/tileSize))*tileSize;
-			rngY = Math.floor((Math.random() * CANVAS_HEIGHT/tileSize))*tileSize;
-			console.log('already exists');
-		}
-	});
-
-	collectables.push(new collectable('apple', rngX, rngY));
+function spawnApples() {
+	for (i = 0; i < appleCount; i = i + 1) {
+		let rngX = Math.floor((Math.random() * CANVAS_WIDTH/tileSize))*tileSize;
+		let rngY = Math.floor((Math.random() * CANVAS_HEIGHT/tileSize))*tileSize;
+	
+		collectables.forEach((object, index) => {
+			while (object.x == rngX && object.y == rngY) {
+				rngX = Math.floor((Math.random() * CANVAS_WIDTH/tileSize))*tileSize;
+				rngY = Math.floor((Math.random() * CANVAS_HEIGHT/tileSize))*tileSize;
+				console.log('already exists');
+			}
+		});
+	
+		collectables.push(new collectable('apple', rngX, rngY));
+	}
 }
 
 function drawTitle() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-	ctx.textAlign = 'center';
-	ctx.font = '30px Arial';
-	ctx.fillText('Snake', 500, 100);
-	ctx.fillText("Press 'G' for SinglePlayer, Press 'H' for Vs", 500, 400);
-	ctx.fillText("WASD for P1, Arrow Keys for P2", 500, 600);
 
 	if (isOn == 'title') {
-		console.log('e');
+		ctx.textAlign = 'center';
+		ctx.font = '30px Arial';
+		ctx.fillText('Snake', 500, 100);
+		ctx.fillText("Press 'G' for SinglePlayer, Press 'H' for Vs", 500, 400);
+		ctx.fillText("Press 'E' for more info", 500, 450);
+	} else if (isOn == 'info') {
+		ctx.textAlign = 'left';
+		ctx.font = '25px Arial';
+		ctx.fillText("Game controlls => WASD for P1, Arrow Keys for P2. Menu controlls => 7 for apple ", 20, 40);
+		ctx.fillText("count, 8 for tile size, 9 for player speed.", 20, 70);
+	}
+	
+	if (isOn == 'title' || isOn == 'info') {
 		requestAnimationFrame(drawTitle);
 	}
 }

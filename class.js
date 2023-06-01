@@ -53,7 +53,6 @@ class player {
 				ctx.fillStyle = 'red';
 				ctx.textAlign = 'center';
 				ctx.fillText('You both died. Headshot!', 500, 400);
-				alert('dead (headshot)');
 				isOn = 'game_over';
 			}
 
